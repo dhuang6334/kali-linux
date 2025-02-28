@@ -12,7 +12,7 @@ load_layer("tls")
 def http_callback(packet):
     if packet.haslayer("HTTPRequest"):  # Check if the packet has an HTTP request layer
         print(f"HTTP Request: {packet.Method} {packet.Host}{packet.Path}")
-def tls_callback(packet: packet):
+def tls_callback(packet: packet.Packet):
     if packet.haslayer(TLS):
         client_hello = packet[TLS]
 
@@ -26,7 +26,8 @@ def tls_callback(packet: packet):
         sni = client_hello.servernames[0].servername.decode() if client_hello.servernames else "N/A"
 
         print(f"TLS {src_ip}:{src_port} -> {dst_ip}:{dst_port} {sni}")
-
+def test(packet: packet.Packet):
+    print(packet.summary())
 # Start sniffing (use an appropriate filter to capture only TCP packets)
-sniff(filter="tcp", prn=tls_callback, store=False)
+sniff(filter="tcp", prn=test, store=False)
 # sniff(filter="tcp port 80", prn=http_callback, store=False)

@@ -2,16 +2,19 @@
 # from scapy.layers import *
 
 
-from scapy.all import sniff, load_layer, TLSClientHello
+from scapy.all import sniff, load_layer, Raw
+from scapy.layers import *
+from scapy.layers.tls.record import *
+from scapy import packet
 
 load_layer("http")
 load_layer("tls")
 def http_callback(packet):
     if packet.haslayer("HTTPRequest"):  # Check if the packet has an HTTP request layer
         print(f"HTTP Request: {packet.Method} {packet.Host}{packet.Path}")
-def tls_callback(packet):
-    if packet.haslayer(TLSClientHello):
-        client_hello = packet[TLSClientHello]
+def tls_callback(packet: packet):
+    if packet.haslayer(TLS):
+        client_hello = packet[TLS]
 
         # Extract source and destination IP/port
         src_ip = packet.src

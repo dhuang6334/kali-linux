@@ -138,7 +138,7 @@ for i in range(len(sys.argv)):
     elif (sys.argv[i] == "-r"):
         rfile = str(sys.argv[i + 1])
         i += 1
-    else:
+    elif (i > 0):
         filt = str(sys.argv[i])
 
 

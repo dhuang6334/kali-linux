@@ -12,6 +12,52 @@ load_layer("http")
 load_layer("tls")
 load_layer("dns")
 
+def extract_sni(raw_data):
+    """
+    Extract the SNI (Server Name Indication) from the TLS ClientHello message
+    embedded in raw data.
+    """
+    # TLS ClientHello is a handshake message (type 1)
+    if len(raw_data) < 5:  # Minimum size for TLS record and handshake type
+        return None
+
+    # First byte is content type (22 for TLS Handshake)
+    if raw_data[0] != 22:  
+        return None
+
+    # Second byte is handshake type (1 for ClientHello)
+    if raw_data[1] != 1:
+        return None
+
+    # Extract the length of the handshake message (4 bytes after type)
+    handshake_len = int.from_bytes(raw_data[3:5], byteorder='big')
+
+    # ClientHello starts immediately after the handshake length
+    client_hello_start = 5
+    client_hello_end = client_hello_start + handshake_len
+
+    # Search for the SNI extension in the ClientHello message
+    client_hello_data = raw_data[client_hello_start:client_hello_end]
+
+    # Extensions start after the cipher suites, and we need to find extension type 0x00 (SNI)
+    extension_offset = 43  # Typically, ClientHello has 43 bytes before extensions
+    while extension_offset < len(client_hello_data):
+        # Get the extension type and length (2 bytes for type, 2 bytes for length)
+        ext_type = int.from_bytes(client_hello_data[extension_offset:extension_offset + 2], byteorder='big')
+        ext_len = int.from_bytes(client_hello_data[extension_offset + 2:extension_offset + 4], byteorder='big')
+
+        # Check if the extension is the SNI (type 0x00)
+        if ext_type == 0x00:  # SNI extension type
+            # Extract the SNI hostname
+            sni = client_hello_data[extension_offset + 4:extension_offset + 4 + ext_len].decode('utf-8')
+            return sni
+        
+        # Move to the next extension
+        extension_offset += 4 + ext_len
+    
+    return None  # SNI not found
+
+
 def callback(packet: Packet):
     timestamp = datetime.fromtimestamp(packet.time)
     formatted_time = timestamp.strftime("%Y-%m-%d %H:%M:%S.%f")
@@ -24,6 +70,33 @@ def callback(packet: Packet):
             dst_port = packet.dport
 
             print(f"{formatted_time} HTTP\t{src_ip}:{src_port}\t-> {dst_ip}:{dst_port}{"\t" if dst_port > 99 else "\t\t"}{str(packet.Host).split("'")[1]} {method} {str(packet.Path).split("'")[1]}")
+    elif packet.haslayer(TCP) and packet.haslayer(Raw):  # Check for raw payload
+        raw_data = packet[Raw].load.decode(errors="ignore")  # Decode bytes safely
+        if raw_data.startswith(("GET ", "POST ")):  # Check if it starts with HTTP method
+            method = "GET" if raw_data.startswith("GET") else "POST" if raw_data.startswith("POST") else "N/A"
+            src_ip = packet[IP].src
+            dst_ip = packet[IP].dst
+            src_port = packet.sport
+            dst_port = packet.dport
+
+            # Extract host and path manually
+            headers = raw_data.split("\r\n")
+            host = next((line.split(": ")[1] for line in headers if line.startswith("Host: ")), "Unknown")
+            request_line = headers[0] if headers else "Unknown"
+            request_line = request_line.split(" ")[1]
+            print(f"{formatted_time} HTTP\t{src_ip}:{src_port}\t-> {dst_ip}:{dst_port}{"\t" if dst_port > 99 else "\t\t"}{host} {method} {request_line}")
+        elif extract_sni(raw_data):
+            sni = extract_sni(raw_data)
+
+            src_ip = packet.src
+            dst_ip = packet.dst
+            src_port = packet.sport
+            dst_port = packet.dport
+
+    
+            print(f"{formatted_time} TLS\t{src_ip}:{src_port}\t-> {dst_ip}:{dst_port}{"\t" if dst_port > 99 else "\t\t"}{sni}")
+
+
     if packet.haslayer("TLS") and packet['TLS'].type == 22 and packet['TLS'].msg[0].msgtype == 1:
         # print(f"TLS Test")
         client_hello = packet["TLS"]
@@ -54,6 +127,7 @@ def callback(packet: Packet):
 interface = None
 wfile = None
 rfile = None
+filt = None
 for i in range(len(sys.argv)):
     if (sys.argv[i] == "-i"):
         interface = str(sys.argv[i + 1])
@@ -64,9 +138,11 @@ for i in range(len(sys.argv)):
     elif (sys.argv[i] == "-r"):
         rfile = str(sys.argv[i + 1])
         i += 1
+    else:
+        filt = str(sys.argv[i+1])
 
 
-packets = sniff(iface= interface if interface else "eth0", prn=callback, offline = rfile)
+packets = sniff(filter = filt, iface= interface if interface else "eth0", prn=callback, offline = rfile)
 if wfile:
     try:
         wrpcap(wfile, packets)

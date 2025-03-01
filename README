@@ -1,0 +1,48 @@
+capture.py [-i interface] [-r tracefile] [-w tracefile] expression
+
+-i  Live capture from the network device <interface> (e.g., eth0). If not
+    specified, the program should automatically select a default interface to
+    listen on (e.g., eth0). Capture should continue indefinitely until the
+    user terminates the program.
+
+-r  Read packets from <tracefile> (tcpdump format). Useful for analyzing
+    network traces that have been captured previously.
+
+-w  Write packets to <tracefile> (tcpdump format). Useful for analyzing
+    network traces that have been captured previously.
+
+
+Sample Output
+
+2025-02-28 23:52:29.803826 DNS  08:f1:ea:5e:8d:00:53    -> 08:00:27:65:36:9e:34763      i.ytimg.com.
+2025-02-28 23:52:32.881826 DNS  08:00:27:65:36:9e:48216 -> aa:bb:cc:dd:ee:ff:53         accounts.google.com.
+2025-02-28 23:52:32.884943 DNS  08:f1:ea:5e:8d:00:53    -> 08:00:27:65:36:9e:48216      accounts.google.com.
+2025-02-28 23:52:34.222930 DNS  08:00:27:65:36:9e:51667 -> aa:bb:cc:dd:ee:ff:53         googleads.g.doubleclick.net.
+2025-02-28 23:52:34.225119 DNS  08:f1:ea:5e:8d:00:53    -> 08:00:27:65:36:9e:51667      googleads.g.doubleclick.net.
+2025-02-28 23:52:34.253384 TLS  08:00:27:65:36:9e:46720 -> aa:bb:cc:dd:ee:ff:443        googleads.g.doubleclick.net
+2025-02-28 23:52:34.616319 DNS  08:00:27:65:36:9e:33959 -> aa:bb:cc:dd:ee:ff:53         www.google.com.
+2025-02-28 23:52:34.618203 DNS  08:f1:ea:5e:8d:00:53    -> 08:00:27:65:36:9e:33959      www.google.com.
+2025-02-28 23:52:35.032453 DNS  08:00:27:65:36:9e:60730 -> aa:bb:cc:dd:ee:ff:53         rr3---sn-q4flrnee.googlevideo.com.
+2025-02-28 23:52:35.034193 DNS  08:f1:ea:5e:8d:00:53    -> 08:00:27:65:36:9e:60730      rr3---sn-q4flrnee.googlevideo.com.
+2025-02-28 23:52:35.160362 TLS  08:00:27:65:36:9e:58710 -> aa:bb:cc:dd:ee:ff:443        rr3---sn-q4flrnee.googlevideo.com
+2025-02-28 23:52:35.381015 TLS  08:00:27:65:36:9e:58720 -> aa:bb:cc:dd:ee:ff:443        rr3---sn-q4flrnee.googlevideo.com
+2025-02-28 23:52:35.596490 TLS  08:00:27:65:36:9e:58724 -> aa:bb:cc:dd:ee:ff:443        rr3---sn-q4flrnee.googlevideo.com
+2025-02-28 23:52:35.742188 TLS  08:00:27:65:36:9e:58738 -> aa:bb:cc:dd:ee:ff:443        rr3---sn-q4flrnee.googlevideo.com
+2025-02-28 23:52:36.174877 TLS  08:00:27:65:36:9e:58748 -> aa:bb:cc:dd:ee:ff:443        rr3---sn-q4flrnee.googlevideo.com
+2025-02-28 23:52:36.195681 TLS  08:00:27:65:36:9e:58760 -> aa:bb:cc:dd:ee:ff:443        rr3---sn-q4flrnee.googlevideo.com
+2025-02-28 23:52:37.521133 DNS  08:00:27:65:36:9e:53142 -> aa:bb:cc:dd:ee:ff:53         yt3.ggpht.com.
+2025-02-28 23:52:37.523643 DNS  08:f1:ea:5e:8d:00:53    -> 08:00:27:65:36:9e:53142      yt3.ggpht.com.
+2025-02-28 23:52:37.568628 TLS  08:00:27:65:36:9e:44094 -> aa:bb:cc:dd:ee:ff:443        yt3.ggpht.com
+2025-02-28 23:52:37.716252 DNS  08:00:27:65:36:9e:46569 -> aa:bb:cc:dd:ee:ff:53         tpc.googlesyndication.com.
+2025-02-28 23:52:37.718529 DNS  08:f1:ea:5e:8d:00:53    -> 08:00:27:65:36:9e:46569      tpc.googlesyndication.com.
+2025-02-28 23:52:37.861787 TLS  08:00:27:65:36:9e:41576 -> aa:bb:cc:dd:ee:ff:443        tpc.googlesyndication.com
+2025-03-01 00:00:37.750526 HTTP 172.25.82.217:53869     -> 172.25.86.40:12345   172.25.86.40:12345 GET /
+2025-03-01 00:00:39.072910 HTTP 172.25.82.217:53870     -> 172.25.86.40:12345   172.25.86.40:12345 GET /
+2025-03-01 00:00:40.510095 HTTP 172.25.82.217:53872     -> 172.25.86.40:12345   172.25.86.40:12345 GET /
+2025-03-01 00:01:01.328808 DNS  08:f1:ea:5e:8d:00:53    -> 08:00:27:65:36:9e:52518      contile.services.mozilla.com.
+2025-03-01 00:01:36.968713 DNS  08:00:27:65:36:9e:47325 -> aa:bb:cc:dd:ee:ff:53         google.com.
+2025-03-01 00:01:36.970846 DNS  08:f1:ea:5e:8d:00:53    -> 08:00:27:65:36:9e:47325      google.com.
+2025-03-01 00:01:36.972944 DNS  08:00:27:65:36:9e:33436 -> aa:bb:cc:dd:ee:ff:5353       example.com.
+2025-03-01 00:01:41.974663 DNS  08:00:27:65:36:9e:36621 -> aa:bb:cc:dd:ee:ff:5353       example.com.
+
+

@@ -104,20 +104,24 @@ def callback(packet: Packet):
 
 # Sniff for TCP packets (capturing all ports)
 interface = ""
-file = ""
+wfile = ""
+rfile = ""
 for i in range(len(sys.argv)):
     if (sys.argv[i] == "-i"):
         interface = str(sys.argv[i + 1])
         i += 1
+    elif (sys.argv[i] == "-w"):
+        wfile = str(sys.argv[i + 1])
+        i += 1
     elif (sys.argv[i] == "-r"):
-        file = str(sys.argv[i + 1])
+        rfile = str(sys.argv[i + 1])
         i += 1
 
 
-packets = sniff(iface= interface if interface != "" else "eth0", prn=callback)
-if file != "":
+packets = sniff(iface= interface if interface != "" else "eth0", prn=callback, offline = False if rfile == "" else rfile)
+if wfile != "":
     try:
-        wrpcap(file, packets)
+        wrpcap(wfile, packets)
     except Exception as e:
         raise e
 # Start sniffing (use an appropriate filter to capture only TCP packets)

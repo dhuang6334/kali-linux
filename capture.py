@@ -13,10 +13,11 @@ load_layer("dns")
 
 def callback(packet: Packet):
     if packet.haslayer("HTTPRequest"):
-        method = packet.Method.split("'")[1]
+        method = str(packet.Method).split("'")[1]
         if method == "GET" or method == "POST":
-            print(f"HTTP Request: {method} {packet.Host.split("'")[1]}{packet.Path.split("'")[1]}")
-    if packet.haslayer("TLS"):
+            print(f"HTTP Request: {method} {str(packet.Host).split("'")[1]}{str(packet.Path).split("'")[1]}")
+    if packet.haslayer("TLS") and packet['TLS'].type == 22 and packet['TLS'].msg[0].msgtype == 1:
+        # print(f"TLS Test")
         client_hello = packet["TLS"]
 
         src_ip = packet.src
@@ -24,20 +25,23 @@ def callback(packet: Packet):
         src_port = packet.sport
         dst_port = packet.dport
 
-        sni = client_hello['TLS_Ext_ServerName'].servernames[0].servername.decode("utf-8") if client_hello['TLS_Ext_ServerName'] else "N/A"
-        print(client_hello['TLS_Ext_ServerName'].servernames if client_hello['TLS_Ext_ServerName'] else "N/A")
+        
+        sni = client_hello['TLS_Ext_ServerName'].servernames[0].servername.decode("utf-8")
+        # print(client_hello['TLS_Ext_ServerName'].servernames if client_hello['TLS_Ext_ServerName'] else "N/A")
 
         print(f"TLS {src_ip}:{src_port} -> {dst_ip}:{dst_port} {sni}")
     if packet.haslayer("DNSQR"):
+        # print("DNS Test")
+        
         DNSRequest = packet["DNSQR"]
-
+        # print(DNSRequest.qtype)
         src_ip = packet.src
         dst_ip = packet.dst
         src_port = packet.sport
         dst_port = packet.dport
 
-        if DNSRequest.qtype == "A":
-            print(f"DNS A Record: {src_ip}:{src_port} -> {dst_ip}:{dst_port} {DNSRequest.qname}")
+        if DNSRequest.qtype == 1: # 1 is type number for A record
+            print(f"DNS A Record: {src_ip}:{src_port} -> {dst_ip}:{dst_port} {str(DNSRequest.qname).split("'")[1]}")
 
 # def http_callback(packet):
 #     if packet.haslayer("HTTPRequest"):  # Check if the packet has an HTTP request layer

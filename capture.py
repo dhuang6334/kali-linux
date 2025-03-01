@@ -139,7 +139,7 @@ for i in range(len(sys.argv)):
         rfile = str(sys.argv[i + 1])
         i += 1
     else:
-        filt = str(sys.argv[i+1])
+        filt = str(sys.argv[i])
 
 
 packets = sniff(filter = filt, iface= interface if interface else "eth0", prn=callback, offline = rfile)

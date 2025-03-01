@@ -28,8 +28,8 @@ def callback(packet: Packet):
         print(client_hello.servernames if client_hello.servernames else "N/A")
 
         print(f"TLS {src_ip}:{src_port} -> {dst_ip}:{dst_port} {sni}")
-    if packet.haslayer("DNS"):
-        DNSRequest = packet["DNS"]
+    if packet.haslayer("DNSQR"):
+        DNSRequest = packet["DNSQR"]
 
         src_ip = packet.src
         dst_ip = packet.dst

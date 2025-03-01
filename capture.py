@@ -1,7 +1,7 @@
 # from scapy.layers.http import *
 # from scapy.layers import *
 
-
+import sys
 from scapy.all import * #sniff, load_layer
 # from scapy.layers import *
 # from scapy.layers.tls.record import *
@@ -103,7 +103,23 @@ def callback(packet: Packet):
 #                 pass  # Ignore packets that don't conform
 
 # Sniff for TCP packets (capturing all ports)
-sniff(prn=callback, store=False)
+interface = ""
+file = ""
+for i in range(len(sys.argv)):
+    if (sys.argv[i] == "-i"):
+        interface = str(sys.argv[i + 1])
+        i += 1
+    elif (sys.argv[i] == "-r"):
+        file = str(sys.argv[i + 1])
+        i += 1
+
+
+packets = sniff(iface= interface if interface != "" else "eth0", prn=callback)
+if file != "":
+    try:
+        wrpcap(file, packets)
+    except Exception as e:
+        raise e
 # Start sniffing (use an appropriate filter to capture only TCP packets)
 # sniff(filter="tcp", prn=test, store=False)
 # sniff(filter="tcp port 80", prn=http_callback, store=False)

@@ -11,6 +11,14 @@ capture.py [-i interface] [-r tracefile] [-w tracefile] expression
 -w  Write packets to <tracefile> (tcpdump format). Useful for analyzing
     network traces that have been captured previously.
 
+The optional <expression> argument is a BPF filter that specifies a subset of
+the traffic to be monitored (similar to tcpdump). This is useful when sniffing
+on a large network or a busy link, allowing to monitor only a certain subset
+of the traffic. For example, one may want to monitor connections only from a
+single host, say 192.168.0.123 - in that case they can provide the filter
+"host 192.168.0.123" to your program, and then it will sniff connections only
+from that host.
+
 
 Sample Output
 

@@ -24,8 +24,8 @@ def callback(packet: Packet):
         src_port = packet.sport
         dst_port = packet.dport
 
-        sni = client_hello.servernames[0].servername.decode("utf-8") if client_hello.servernames else "N/A"
-        print(client_hello.servernames if client_hello.servernames else "N/A")
+        sni = client_hello['TLS_Ext_ServerName'].servernames[0].servername.decode("utf-8") if client_hello['TLS_Ext_ServerName'] else "N/A"
+        print(client_hello['TLS_Ext_ServerName'].servernames if client_hello['TLS_Ext_ServerName'] else "N/A")
 
         print(f"TLS {src_ip}:{src_port} -> {dst_ip}:{dst_port} {sni}")
     if packet.haslayer("DNSQR"):

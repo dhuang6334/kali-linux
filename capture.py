@@ -85,7 +85,7 @@ def callback(packet: Packet):
             request_line = headers[0] if headers else "Unknown"
             request_line = request_line.split(" ")[1]
             print(f"{formatted_time} HTTP\t{src_ip}:{src_port}\t-> {dst_ip}:{dst_port}{"\t" if dst_port > 99 else "\t\t"}{host} {method} {request_line}")
-        elif extract_sni(raw_data):
+        elif extract_sni(raw_data.encode("utf-8")):
             sni = extract_sni(raw_data)
 
             src_ip = packet.src

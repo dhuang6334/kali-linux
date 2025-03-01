@@ -36,8 +36,8 @@ def callback(packet: Packet):
         src_port = packet.sport
         dst_port = packet.dport
 
-        if DNSRequest["qtype"] == "A":
-            print(f"DNS A Record: {src_ip}:{src_port} -> {dst_ip}:{dst_port} {DNSRequest["qname"]}")
+        if DNSRequest.qtype == "A":
+            print(f"DNS A Record: {src_ip}:{src_port} -> {dst_ip}:{dst_port} {DNSRequest.qname}")
 
 # def http_callback(packet):
 #     if packet.haslayer("HTTPRequest"):  # Check if the packet has an HTTP request layer

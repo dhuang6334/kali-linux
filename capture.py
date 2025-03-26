@@ -134,13 +134,22 @@ rfile = None
 filt = None
 for i in range(len(sys.argv)):
     if (sys.argv[i] == "-i"):
+        if (i + 1 == len(sys.argv)):
+            print("Missing argument [-i interface]")
+            exit()
         interface = str(sys.argv[i + 1])
     elif (sys.argv[i] == "-w"):
+        if (i + 1 == len(sys.argv)):
+            print("Missing argument [-w tracefile]")
+            exit()
         wfile = str(sys.argv[i + 1])
     elif (sys.argv[i] == "-r"):
+        if (i + 1 == len(sys.argv)):
+            print("Missing argument [-r tracefile]")
+            exit()
         rfile = str(sys.argv[i + 1])
     
-if (sys.argv[len(sys.argv) - 1] != "-i" and sys.argv[len(sys.argv) - 1] != "-w" and sys.argv[len(sys.argv) - 1] != "-r"):
+if (len(sys.argv) > 1 and sys.argv[len(sys.argv) - 2] != "-i" and sys.argv[len(sys.argv) - 2] != "-w" and sys.argv[len(sys.argv) - 2] != "-r"):
     filt = str(sys.argv[i])
 
 print(f"Interface: {interface} | Write File: {wfile} | Read File: {rfile} | Filter: {filt}")

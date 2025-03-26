@@ -150,7 +150,7 @@ for i in range(len(sys.argv)):
         rfile = str(sys.argv[i + 1])
     
 if (len(sys.argv) > 1 and sys.argv[len(sys.argv) - 2] != "-i" and sys.argv[len(sys.argv) - 2] != "-w" and sys.argv[len(sys.argv) - 2] != "-r"):
-    filt = str(sys.argv[i])
+    filt = str(sys.argv[len(sys.argv) - 1])
 
 print(f"Interface: {interface} | Write File: {wfile} | Read File: {rfile} | Filter: {filt}")
 

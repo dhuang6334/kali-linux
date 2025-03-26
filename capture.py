@@ -135,16 +135,15 @@ filt = None
 for i in range(len(sys.argv)):
     if (sys.argv[i] == "-i"):
         interface = str(sys.argv[i + 1])
-        i += 1
     elif (sys.argv[i] == "-w"):
         wfile = str(sys.argv[i + 1])
-        i += 1
     elif (sys.argv[i] == "-r"):
         rfile = str(sys.argv[i + 1])
-        i += 1
-    elif (i > 0):
-        filt = str(sys.argv[i])
+    
+if (sys.argv[len(sys.argv) - 1] != "-i" and sys.argv[len(sys.argv) - 1] != "-w" and sys.argv[len(sys.argv) - 1] != "-r"):
+    filt = str(sys.argv[i])
 
+print(f"Interface: {interface} | Write File: {wfile} | Read File: {rfile} | Filter: {filt}")
 
 packets = sniff(filter = filt, iface= interface if interface else "eth0", prn=callback, offline = rfile)
 if wfile:

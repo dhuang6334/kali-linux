@@ -98,8 +98,7 @@ def callback(packet: Packet):
     
             print(f"{formatted_time} TLS\t{src_ip}:{src_port}\t-> {dst_ip}:{dst_port}{"\t" if dst_port > 99 else "\t\t"}{sni}")
 
-
-    if packet.haslayer("TLS") and packet['TLS'].type == 22 and packet['TLS'].msg[0].msgtype == 1:
+    if packet.haslayer("TLS") and packet['TLS'].type == 22 and hasattr(packet['TLS'], "msg") and hasattr(packet['TLS'].msg[0], "msgtype") and packet['TLS'].msg[0].msgtype == 1:
         # print(f"TLS Test")
         client_hello = packet["TLS"]
 

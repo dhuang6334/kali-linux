@@ -60,7 +60,7 @@ def extract_sni(raw_data):
 
 
 def callback(packet: Packet):
-    timestamp = datetime.fromtimestamp(packet.time)
+    timestamp = datetime.fromtimestamp(float(packet.time))
     formatted_time = timestamp.strftime("%Y-%m-%d %H:%M:%S.%f")
     if packet.haslayer("HTTPRequest"):
         method = str(packet.Method).split("'")[1]
@@ -153,7 +153,16 @@ if (len(sys.argv) > 1 and sys.argv[len(sys.argv) - 2] != "-i" and sys.argv[len(s
 
 print(f"Interface: {interface} | Write File: {wfile} | Read File: {rfile} | Filter: {filt}")
 
-packets = sniff(filter = filt, iface= interface if interface else "eth0", prn=callback, offline = rfile)
+if rfile:
+    # Read packets from the specified pcap file
+    if filt:
+        packets = sniff(offline=rfile, filter=filt, prn=callback)
+    else:
+        packets = sniff(offline=rfile, prn=callback)
+else:
+    # Perform live capture
+    packets = sniff(filter=filt, iface=interface if interface else "eth0", prn=callback)
+
 if wfile:
     try:
         wrpcap(wfile, packets)

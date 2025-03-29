@@ -1,0 +1,98 @@
+CSE 363: Offensive Security, Spring 2025
+
+Homework 1: Network Sniffing
+-------------------------------------------------------------------------------
+
+Submission deadline: 2/28/2025 11:59pm EDT
+Submission site: https://mycourses.stonybrook.edu/d2l/home/1802443
+
+In this assignment you will get familiar with the Scapy network traffic
+capture/analysis/generation framework, and use it to develop a simple network
+sniffer. As a minimum, your tool should work on Linux - you are welcome to
+implement and test support for other platforms (Python makes this easy). Your
+tool will be tested on the 64-bit Kali Linux 2024.4 virtual machine, so make
+sure your code works in this environment:
+https://www.kali.org/get-kali/#kali-virtual-machines
+
+You can use additional Python libraries, as long as they are readily available
+through 'apt install' on Kali Linux, without any additional configuration.
+Make sure to clearly document in your README any such dependencies, and
+provide clear installation instructions.
+
+
+Your program should conform to the following specification:
+
+capture.py [-i interface] [-r tracefile] expression
+
+-i  Live capture from the network device <interface> (e.g., eth0). If not
+    specified, the program should automatically select a default interface to
+    listen on (e.g., eth0). Capture should continue indefinitely until the
+    user terminates the program.
+
+-r  Read packets from <tracefile> (tcpdump format). Useful for analyzing
+    network traces that have been captured previously.
+
+The optional <expression> argument is a BPF filter that specifies a subset of
+the traffic to be monitored (similar to tcpdump). This is useful when sniffing
+on a large network or a busy link, allowing to monitor only a certain subset
+of the traffic. For example, one may want to monitor connections only from a
+single host, say 192.168.0.123 - in that case they can provide the filter
+"host 192.168.0.123" to your program, and then it will sniff connections only
+from that host.
+
+
+Your tool should perform the following operations:
+
+1) For HTTP traffic, it should parse GET and POST requests and print i) the
+method used (GET or POST), ii) the destination host name contained in the
+"Host:" HTTP header (e.g., "www.cs.stonybrook.edu"), and iii) the Request URI.
+
+2) For TLS traffic, it should parse the Client Hello message and print the
+destination host name (e.g., "www.cs.stonybrook.edu") that is present in the
+Server Name Indication field.
+
+3) For DNS traffic, it should parse A record requests (handling AAAA requests
+is optional) and print the requested name (e.g., "www.cs.stonybrook.edu").
+
+For all three, it should also print a timestamp and the source and destination
+IP addresses and ports of the packet. No need to print HTTP/DNS responses,
+just the requests.
+
+Example output:
+
+2025-02-04 13:14:25.398317 DNS  192.168.190.128:35706 -> 8.8.8.8:53 www.cs.stonybrook.edu
+2025-02-04 13:14:33.224487 HTTP 192.168.190.128:57234 -> 23.185.0.4:80 www.cs.stonybrook.edu GET /research/area/Security-and-Privacy
+2025-02-04 13:14:24.494045 TLS  192.168.190.128:59330 -> 104.244.42.193:443 google.com
+
+Your tool should be able to recognize HTTP, TLS, and DNS traffic
+*irrespectively* of the destination port number used. It is possible that
+"hidden" HTTP/TLS/DNS servers may be listening to ports other than 80/443/53,
+and your tool will be useful for detecting them.
+
+You are *not* required to perform any form of TCP stream reassembly. For your
+implementation, it is sufficient to just parse each packet individually.
+
+
+What to submit:
+
+A tarball (.tar.gz) with:
+- The python tool, named 'capture.py'
+- An ASCII file named 'README' containing i) a brief description of your
+  program, and ii) example output from a test run, including some cases of
+  captured HTTP/TLS requests towards non-standard ports.
+
+
+Hints
+
+- Scapy has great online documentation:
+  https://scapy.readthedocs.io/en/latest/
+
+- Scapy does not load by default all available parsers. Check out
+  load_layer("http") and load_layer("tls"). You may have to "import
+  cryptography" for the TLS parser to work properly.
+
+- You can use tcpdump/Wireshark to capture some traffic in a trace, and then
+  use the same trace to test/debug your program.
+
+- You can spin up your own servers listening on non-standard ports to generate
+  test traffic.

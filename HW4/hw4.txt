@@ -1,0 +1,102 @@
+CSE 363: Offensive Security, Spring 2025
+
+Homework 4: Infostealer Implant
+-------------------------------------------------------------------------------
+
+Submission deadline: 9 May 2025 11:59pm EDT
+Submission site: https://mycourses.stonybrook.edu/d2l/home/1802443
+
+In this assignment you will develop an infostealer malware implant for Linux
+systems, and a primitive server for receiving the exfiltrated data. The
+malware implant, named 'tmp363', will scan a victim's system for files of
+interest and exfiltrate them to the server. The server, named 'server363' will
+simply accept the data from each victim and write it on disk.
+
+The programming language and communication protocol between the implant and
+the server are up to you, as long as everything can be tested on the Kali
+Linux VM we have used in previous assignments (Python or Go are recommended).
+If extra libraries not already installed by default on Kali are required,
+please provide the corresponding 'apt install' commands in your README.
+
+1) Implant
+
+At a minimum, the implant will search all users' home directories under /home/
+for the following files:
+
+- All SSH-related files/dirs under ~/.ssh/
+- All Configuration-related files/dirs under ~/.config/
+- All Cloud provider files/dirs under ~/.aws/ or ~/.gcloud/ or ~/.azure/
+- All shell history files matching the pattern ~/.*_history
+
+You are welcome to implement support for other types of sensitive/interesting
+files under the /home/ directory. For simplicity, there is no need to scan
+/root/ or any other system directories (the core functionality would be the
+same anyway).
+
+The implant will read the contents of all discovered files into memory, and
+compress and archive them in a single file (e.g. a ZIP file or any other
+compression format you want), by preserving their relative paths. It will then
+encrypt the archive using symmetric key encryption (e.g., AES or any other
+symmetric key encryption algorithm you want) using a predefined key hard-coded
+in the program.
+
+IMPORTANT REQUIREMENT: None of these operations should write to the disk. The
+initial search for files and reading of each discovered file should be the
+only disk-related operations the program will perform. Nothing should be
+*written* to disk (e.g., no temporary files). Also, nothing should be printed
+to stdout or stderr.
+
+The program should then connect to the server, transmit the encrypted archive,
+and terminate. To help with testing, the IP address and port of the
+destination server should be provided as a command-line argument (no need for
+hostname resolution). For example:
+
+./tmp363 130.245.42.42 6666
+./tmp363 127.0.0.1 12345
+
+
+2) Server
+
+The server should always listen for connections from victims. For each
+accepted connection, it will read the transmitted data, decrypt it with the
+same hard-coded key, and extract its contents on disk in a new subdirectory
+(created in the same directory in which the server runs). The name of the
+subdirectory should be the concatenation of a timestamp and the victim's IP
+address, e.g., "2025-04-13:06:36:58_130.245.42.43".
+
+For simplicity, you are not required to handle multiple concurrent
+connections, i.e., the server will handle one client at a time. After
+receiving the files from a victim, the server should continue listening for
+requests from other victims.
+
+To help with testing, the IP address and port number on which the server will
+listen on should be provided as a command-line argument. For example:
+
+./server363 130.245.42.42 6666
+./server363 127.0.0.1 12345
+
+What to submit:
+
+A tarball (.tar.gz) with:
+- The implant and server tools, including all source code and installation
+  instructions for any dependencies.
+- An ASCII file named README with a brief description of your program and
+  your design choices.
+
+
+Hints:
+
+1) You are free to implement any communication protocol between the client and
+the server. It can be as simple as a plain TCP connection or an HTTP POST
+request. Any additional transport encryption is optional, because the
+exfiltrated archive will already be encrypted before transmission.
+
+2) The easiest way to test your program is to run both the client and the
+server on Kali:
+
+Console 1> ./server363 127.0.0.1 12345
+Console 2> ./tmp363 127.0.0.1 12345
+
+3) You can add more users using the 'adduser <username>' command (as root),
+and then populate their home directories with dummy files matching the above
+rules.
